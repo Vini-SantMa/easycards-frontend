@@ -132,6 +132,23 @@ function App() {
     setCarregandoTutor(false);
   }
 
+  const desfazerUltimaNota = async () => {
+    try {
+      const res = await fetch('https://easycards-api.onrender.com/desfazer-revisao', { method: 'POST' });
+      const d = await res.json();
+      
+      if (d.status === 'sucesso') {
+        alert("Ação desfeita! O banco de dados voltou ao estado anterior.");
+        setCardAtualIdx(cardAtualIdx - 1); 
+        setMostrarVerso(false);
+      } else {
+        alert(d.mensagem);
+      }
+    } catch (error) { 
+      alert("Erro ao tentar desfazer a revisão."); 
+    }
+  }
+
   if (!session) {
     return (
       <div className="auth-container">
@@ -254,6 +271,11 @@ function App() {
       {aba === 'revisar' && (
         <div className="revisar-content">
           <h2>Sessão de Estudos</h2>
+          {cardAtualIdx > 0 && (
+            <button onClick={desfazerUltimaNota} className="btn-undo">
+              ↩️ Ops, cliquei errado! Desfazer nota anterior
+            </button>
+          )}
           {cardsRevisao.length > 0 ? (
             <div className="study-card">
               <h3 className="card-frente">{cardsRevisao[cardAtualIdx].frente}</h3>
