@@ -80,7 +80,14 @@ function App() {
     if (!nomeDeck) return alert("Voce precisa nomear seu deck");
     const res = await fetch('https://easycards-api.onrender.com/criar-deck', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: nomeDeck, user_id: session.user.id }) });
     const dados = await res.json();
-    if (dados.status === "sucesso") { setIdDeckAtivo(dados.id); alert(`Deck criado!`); carregarDecks(); }
+    
+    if (dados.status === "sucesso") { 
+      setIdDeckAtivo(dados.id); 
+      alert(`Deck criado!`); 
+      carregarDecks(); 
+    } else {
+      alert(dados.detalhes); 
+    }
   };
   
   const salvarCardsNoBanco = async () => {
@@ -257,91 +264,3 @@ function App() {
             <div className="ia-review">
               <h3>Revise e Edite:</h3>
               {cardsIA.map((c, i) => (
-                <div key={i} className="edit-card">
-                  <textarea className="edit-area" value={c.frente} onChange={(e) => { const novos = [...cardsIA]; novos[i].frente = e.target.value; setCardsIA(novos); }} rows="2" />
-                  <textarea className="edit-area" value={c.verso} onChange={(e) => { const novos = [...cardsIA]; novos[i].verso = e.target.value; setCardsIA(novos); }} rows="2" />
-                </div>
-              ))}
-              <button className="btn-save-all" onClick={salvarCardsNoBanco}>💾 Salvar Tudo</button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {aba === 'revisar' && (
-        <div className="revisar-content">
-          <h2>Sessão de Estudos</h2>
-          {cardAtualIdx > 0 && (
-            <button onClick={desfazerUltimaNota} className="btn-undo">
-              ↩️ Ops, cliquei errado! Desfazer nota anterior
-            </button>
-          )}
-          {cardsRevisao.length > 0 ? (
-            <div className="study-card">
-              <h3 className="card-frente">{cardsRevisao[cardAtualIdx].frente}</h3>
-              {mostrarVerso ? (
-                <div>
-                  <hr className="card-divider"/>
-                  <p className="card-verso">{cardsRevisao[cardAtualIdx].verso}</p>
-                   {cardsRevisao[cardAtualIdx].metadata && ( <div className="card-metadata-box">
-                     <p className="metadata-label">🔗 Referência de Estudo:</p>
-                     <p className="metadata-content">{cardsRevisao[cardAtualIdx].metadata}</p>
-                   </div>
-                      )}
-                  <div className="btn-group">
-                    <button onClick={() => enviarNota(0)} className="btn-note btn-red">0 - Errei</button>
-                    <button onClick={() => enviarNota(3)} className="btn-note btn-blue">3 - Difícil</button>
-                    <button onClick={() => enviarNota(5)} className="btn-note btn-green">5 - Fácil</button>
-                  </div>
-                  <div className="tutor-section">
-                    {!explicacaoTutor && !carregandoTutor && (
-                      <button onClick={pedirAjudaTutor} className="btn-tutor">🤖 Não entendi. Pedir dica ao Tutor IA</button>
-                    )}
-                    {carregandoTutor && <p className="tutor-loading">O tutor está formulando uma dica...</p>}
-                    {explicacaoTutor && (
-                      <div className="tutor-result">
-                        <h4 className="tutor-header">💡 Dica do Mentor:</h4>
-                        <p className="tutor-text">{explicacaoTutor}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <button onClick={() => setMostrarVerso(true)} className="btn-show">👀 Mostrar Resposta</button>
-              )}
-            </div>
-          ) : (<p>✅ Você já revisou todos os cards de hoje.</p>)}
-        </div>
-      )}
-
-      {aba === 'meus_decks' && (
-        <div className="decks-content">
-          <h2>📂 Gerenciador de Decks</h2>
-          <div className="decks-layout">
-            <div className="decks-list">
-              {listaDecks.map((deck) => (
-                <button key={deck.id} onClick={() => carregarCardsDoDeck(deck.id, deck.nome)} className="deck-item">📘 {deck.nome}</button>
-              ))}
-            </div>
-            <div className="deck-viewer">
-              {nomeDeckSelecionado ? (
-                <>
-                  <h4>Cards em: {nomeDeckSelecionado}</h4>
-                  <div className="cards-scroll">
-                    {cardsDoDeckSelecionado.map((card, idx) => (
-                      <div key={idx} className="card-list-item">
-                        <p><strong>P:</strong> {card.frente}</p><p><strong>R:</strong> {card.verso}</p>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (<p></p>)}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-export default App
