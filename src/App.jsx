@@ -138,7 +138,7 @@ function App() {
       const d = await res.json();
       
       if (d.status === 'sucesso') {
-        alert("Ação desfeita! O banco de dados voltou ao estado anterior.");
+        alert("Ação desfeita!");
         setCardAtualIdx(cardAtualIdx - 1); 
         setMostrarVerso(false);
       } else {
